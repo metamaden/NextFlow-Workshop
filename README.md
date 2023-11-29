@@ -31,7 +31,7 @@ discussion of NextFlow applications.
 
 ### Slides
 
-* [Session 1]()
+* [Session 1](https://docs.google.com/presentation/d/1Fu1U-x0Iv7x88GcRJfib0Ixxxh9R4dkeR6-0h0ZRZXI/edit?usp=sharing)
 
 ## Session 2: Key NextFlow concepts 
 
