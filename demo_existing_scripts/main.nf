@@ -10,7 +10,7 @@ process FastQC {
 
     shell:
         // Determine sample ID from filename
-        sample_id = fastqc_untrimmed_input.tokenize('.')[0]
+        sample_id = file(fastqc_untrimmed_input).name.toString().tokenize('.')[0]
         '''
         fastqc --extract !{fastqc_untrimmed_input}
         cp !{sample_id}_fastqc/summary.txt !{sample_id}_summary.txt
@@ -26,9 +26,9 @@ process FilterSummaries {
 
     shell:
         // Determine sample ID from filename
-        sample_id = full_summary.tokenize('_')[0]
+        sample_id = file(full_summary).name.toString().tokenize('_')[0]
         '''
-        Rscript filter_summaries.R
+        filter_summaries.R
         '''
 }
 
@@ -44,12 +44,17 @@ process GatherSummaries {
 
     shell:
         '''
-        python gather_summaries.py
+        gather_summaries.py
         cp .command.log gather_summaries.log
         '''
 }
 
 workflow {
+    params.output = "${workflow.projectDir}/out"
+
     fastq_files = Channel
-        .fromPath("${workflow.projectDir}/demo_existing_scripts/data/sample{1,2}.fastq.gz")
+        .fromPath("${workflow.projectDir}/data/sample{1,2}.fastq.gz")
+    FastQC(fastq_files)
+    FilterSummaries(FastQC.out.full_summary)
+    GatherSummaries(FilterSummaries.out.filtered_summary.collect())
 }
