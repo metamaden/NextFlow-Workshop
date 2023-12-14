@@ -6,7 +6,7 @@ process FastQC {
 
     output:
         path "${sample_id}_fastqc"
-        file "${sample_id}_summary.txt", emit: fastqc_summary
+        path "${sample_id}_summary.txt", emit: full_summary
 
     shell:
         // Determine sample ID from filename
@@ -14,6 +14,21 @@ process FastQC {
         '''
         fastqc --extract !{fastqc_untrimmed_input}
         cp !{sample_id}_fastqc/summary.txt !{sample_id}_summary.txt
+        '''
+}
+
+process FilterSummaries {
+    input:
+        path full_summary
+
+    output:
+        path "${sample_id}_filtered_summary.csv", emit: filtered_summary
+
+    shell:
+        // Determine sample ID from filename
+        sample_id = full_summary.tokenize('_')[0]
+        '''
+        Rscript filter_summaries.R
         '''
 }
 
