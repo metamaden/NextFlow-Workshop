@@ -32,6 +32,23 @@ process FilterSummaries {
         '''
 }
 
+process GatherSummaries {
+    publishDir "${params.output}"
+
+    input:
+        path filtered_summaries
+
+    output:
+        path "combined_summary.csv"
+        path "gather_summaries.log"
+
+    shell:
+        '''
+        python gather_summaries.py
+        cp .command.log gather_summaries.log
+        '''
+}
+
 workflow {
     fastq_files = Channel
         .fromPath("${workflow.projectDir}/demo_existing_scripts/data/sample{1,2}.fastq.gz")
